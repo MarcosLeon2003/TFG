@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Strategies in Formula 1</title>
+    <link rel="icon" href="https://lezebre.lu/images/detailed/79/45334-Sticker-Formula-1-nouveau-logo-F1.png" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg" alt="Fórmula 1 Logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('strategy') }}">Strategy</a></li>
+                <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                <li><a href="{{ url_for('circuits') }}">Circuits</a></li>
+                <li><a href="{{ url_for('teams') }}">Teams</a></li>
+                <li><a href="{{ url_for('drivers') }}">Drivers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Race Strategies in Formula 1</h1>
+        <p>
+            Strategy plays a critical role in Formula 1. Teams use data, simulations, and real-time analysis to gain an edge over competitors.
+            Every decision, from tire choices to pit stops, can make or break a race.
+        </p>
+        <div class="content-section">
+            <div class="pag2-titleandtext">
+                <h2>Tyre Management</h2>
+                <p>
+                    In Formula 1, tires are a critical part of race strategy, with two main types: slicks for dry conditions and treaded tires for wet weather. 
+                    Slicks come in hard (durable but slower), medium (balanced), and soft (grippier but short-lived) compounds. Wet tires include intermediates 
+                    for light rain and full wets for heavy rain, both designed to displace water but with varying effectiveness on drying tracks.
+                </p>
+                <p>
+                    Tires operate best within a specific temperature range. If too cold, they lack grip; if too hot, they degrade quickly. High-degradation circuits 
+                    like Bahrain or Silverstone wear tires faster, while smoother tracks like Monaco allow longer stints. Key tire issues include graining 
+                    (temporary loss of grip due to rubber buildup) and blistering (permanent damage from overheating).
+                </p>
+                <p>
+                    Strategy revolves around choosing the right compound based on track conditions, managing wear, and timing pit stops effectively. 
+                    Tracks with high speeds and abrasive surfaces demand durable compounds, while tighter, low-speed circuits favor softer tires for better grip. 
+                    Effective tire management can make or break a race.
+                </p>
+            </div>
+            <img src="https://cdn-8.motorsport.com/images/amp/YpNwMlj0/s1000/lewis-hamilton-mercedes-amg-pe.jpg" alt="F1 tire strategy">
+        </div>
+        <div class="content-section">
+            <img src="https://cdn.autobild.es/sites/navi.axelspringer.es/public/media/image/2023/10/lando-norris-boxes-qatar-3190638.jpg?tf=3840x" alt="Pit stop action">
+            <div class="pag2-titleandtext">
+                <h2>Pit Stops</h2>
+                <p>
+                    In Formula 1, pit stops are crucial for changing tires, which wear down during the race. Teams aim to change tires quickly—sometimes in under 2 seconds—to maintain performance. 
+                    Pit stops also allow for brief checks on the car for any issues.                
+                </p>
+                <p>
+                    Pit stops are a key part of race strategy. Drivers may pit early to avoid traffic, react to changing weather, or "undercut" competitors by stopping before them. An undercut happens when a driver pits earlier than a rival, 
+                    hoping that fresh tires will allow them to set faster lap times and gain positions before their opponent pits. 
+                    On the other hand, an overcut occurs when a driver stays out longer than their competitor, aiming to gain an advantage by using older tires for as long as possible and hoping that the fresher tires of the competitor won’t 
+                    result in enough of an advantage to overtake them on track after they pit. A well-timed pit stop can be a significant advantage.               
+                </p>
+                <p>
+                    There is no mandatory minimum number of pit stops in a race, but drivers must use at least two different types of tire compounds in dry conditions, 
+                    meaning they must stop at least once. This rule adds complexity to the team's strategy.
+                </p>
+            </div>
+        </div>
+        <div class="content-section">
+            <div class ="pag2-titleandtext">
+                <h2>Weather and Safety</h2>
+                <p>
+                    In Formula 1, both weather and safety have a significant impact on race strategies. Weather conditions can change rapidly, influencing tire choices and pit stop timing. For example, when it rains, teams must switch to wet tires, 
+                    which provide more grip but wear out faster. This can alter the strategy, as teams have to decide when to pit for fresh tires or when to make the switch back to dry tires. A sudden change in weather can lead to unpredictable outcomes, 
+                    and teams must be ready to adjust their plans in real-time.                
+                </p>
+                <p>
+                    Safety is equally important in F1. When there’s an accident or dangerous conditions, safety measures like the Safety Car or Virtual Safety Car (VSC) are deployed. These interventions slow the race down and allow marshals to clear the track. 
+                    During these periods, teams need to adjust their strategies, making decisions about when to pit or manage tire and fuel usage.                
+                </p>
+                <p>
+                    The ability to quickly adapt to changing weather or safety conditions is crucial. Teams that manage these factors well can gain an advantage, as a timely pit stop or strategic tire change can make all the difference in a race. 
+                    Ultimately, both weather and safety are key to shaping a team’s race approach and can significantly affect the final result.                
+                </p>
+            </div>
+            <img src="https://img.redbull.com/images/q_auto,f_auto/redbullcom/2023/4/25/bm8b5wlhxutd6n889yal/max-verstappen-japanese-grand-prix-2022" alt="F1 weather challenges">
+        </div>
+    </main>
+</body>
+</html>

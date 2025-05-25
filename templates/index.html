@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Fórmula 1</title>
+    <link rel="icon" href="https://lezebre.lu/images/detailed/79/45334-Sticker-Formula-1-nouveau-logo-F1.png" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg" alt="Fórmula 1 Logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('strategy') }}">Strategy</a></li>
+                <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                <li><a href="{{ url_for('circuits') }}">Circuits</a></li>
+                <li><a href="{{ url_for('teams') }}">Teams</a></li>
+                <li><a href="{{ url_for('drivers') }}">Drivers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Welcome to the Formula 1</h1>
+        <p>
+             The F1 is awesome...
+        </p>
+    </main>
+</body>
+</html>

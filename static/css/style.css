@@ -1,0 +1,333 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+    background-image: url('https://fotografias.lasexta.com/clipping/cmsimages01/2023/06/27/1DC35DBB-64DE-46A3-9E9F-2D52B3079A25/salida-australia_98.jpg?crop=4424,2489,x0,y254&width=1900&height=1069&optimize=low&format=webply');
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+}
+
+header img {
+    height: 50px;
+    margin-right: 20px;
+}
+
+nav {
+    margin-left: auto;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+main, section {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    margin: 20px;
+    border-radius: 10px;
+    color: white;
+}
+
+/* CIRCUITOS - CIRCUITS.HTML */
+
+.circuit {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 20px;
+    width: calc(25% - 20px); 
+    box-sizing: border-box;
+    text-align: center; /* Centra el contenido */
+}
+
+.circuit img {
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.circuits-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    color: black;
+}
+
+/* EQUIPOS - TEAMS.HTML */
+
+.team img {
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.teams-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.team {
+    width: 28%;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    text-align: center; /* Centra el contenido */
+}
+
+/* PILOTOS - DRIVERS.HTML */
+
+.driver-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Distribuye el espacio entre las tarjetas */
+    gap: 20px; /* Espacio entre las tarjetas */
+    padding: 20px; /* Añade un poco de separación interna */
+}
+
+.driver {
+    width: calc(25% - 20px); /* Cada tarjeta ocupa la mitad del ancho menos espacio entre columnas */
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    margin-bottom: 20px; /* Espacio inferior entre tarjetas */
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: white; /* Asegúrate de que el texto sea legible */
+    text-align: center; /* Centra el contenido */
+}
+
+.driver img {
+    max-width: 70%; /* Ajusta el ancho de las imágenes */
+    height: auto;
+    border-radius: 10px; /* Esquinas redondeadas */
+    margin-bottom: 10px; /* Espacio inferior con el texto */
+}
+
+.driver h2 {
+    margin: 10px 0;
+    font-size: 1.5em;
+}
+
+.driver p {
+    margin: 5px 0;
+    font-size: 1em;
+}
+
+/* Learn */
+
+/*
+.simular-button {
+    display: block;
+    margin: 20px auto;
+    padding: 15px 30px;
+    font-size: 24px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.simular-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 1);
+}
+*/
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.large-button {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+    width: calc(50% - 20px); /* Dos botones ocupando el ancho completo */
+    box-sizing: border-box;
+    padding: 20px;
+    transition: transform 0.3s;
+}
+
+.large-button img {
+    width: 90%;
+    border-radius: 8px;
+}
+
+.large-button h2 {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.large-button p {
+    font-size: 16px;
+    color: #666;
+}
+
+.large-button:hover {
+    transform: scale(1.05);
+}
+
+/* strategy - strategy.HTML */
+
+.strategy-line {
+    display: flex;
+    height: 20px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.stint {
+    height: 100%;
+    position: relative;
+}
+
+.stint.blando {
+    background-color: red;
+}
+
+.stint.medio {
+    background-color: white;
+    border: 1px solid black;
+}
+
+.stint.duro {
+    background-color: yellow;
+}
+
+.stop-marker {
+    position: absolute;
+    top: -30px;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.stop-marker img {
+    height: 20px;
+    width: 20px;
+}
+
+/* pag1 y pag2 */
+
+.content-section {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    text-align: justify; /* Justifica el texto */
+}
+
+.content-section img {
+    max-width: 30%;
+    border-radius: 8px;
+    margin: 0 50px;
+}
+
+/* Strategia pagina antes de darle al boton */
+
+/* Estilo para las etiquetas (subtítulos) */
+label {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    letter-spacing: 0px; /* Espaciado entre letras */
+    text-align: left;
+    margin-bottom: 5px; /* Reducción del margen entre la etiqueta y el selector */
+}
+
+/* Selectors */
+
+select {
+    padding: 10px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.8), rgba(34, 34, 34, 0.8));
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    flex: 1 1 30%; /* Ocupa el 30% del ancho */
+    max-width: 300px; /* Limita el tamaño máximo de los selectores */
+    margin-right: 40px;
+}
+
+select:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/*boton*/
+
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(90deg, #ff4500, #d63031);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    flex: 1 1 30%; /* Ocupa el 30% del ancho */
+    max-width: 300px; /* Limita el tamaño máximo del botón */
+}
+
+/* Asegura que el botón se vea mejor cuando se pase el cursor o se haga clic */
+
+button:hover {
+    background: linear-gradient(90deg, #e84118, #c23616);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+button:active {
+    background: #b71500;
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
+    transform: translateY(0);
+}
+
+
+
+
+

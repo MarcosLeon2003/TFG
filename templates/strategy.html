@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy - Fórmula 1</title>
+    <link rel="icon" href="https://lezebre.lu/images/detailed/79/45334-Sticker-Formula-1-nouveau-logo-F1.png" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg" alt="Fórmula 1 Logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('strategy') }}">Strategy</a></li>
+                <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                <li><a href="{{ url_for('circuits') }}">Circuits</a></li>
+                <li><a href="{{ url_for('teams') }}">Teams</a></li>
+                <li><a href="{{ url_for('drivers') }}">Drivers</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Formula 1 Race Strategy</h1>
+        <form id="strategy-form">
+            <label for="circuit-selector">Circuit:</label>
+            <select id="circuit-selector">
+                <option value="Bahréin - Sakhir">Bahréin - Sakhir</option>
+                <option value="Arabia Saudí - Jeddah">Arabia Saudí - Jeddah</option>
+                <option value="Australia - Albert Park">Australia - Albert Park</option>
+                <option value="Japón - Suzuka">Japón - Suzuka</option>
+                <option value="China - Shanghái">China - Shanghái</option>
+                <option value="Miami - Miami">Miami - Miami</option>
+                <option value="Emilia-Romaña - Imola">Emilia-Romaña - Imola</option>
+                <option value="Mónaco - Monte Carlo">Mónaco - Monte Carlo</option>
+                <option value="Canadá - Montreal">Canadá - Montreal</option>
+                <option value="España - Montmeló">España - Montmeló</option>
+                <option value="Austria - Red Bull Ring">Austria - Red Bull Ring</option>
+                <option value="Reino Unido - Silverstone">Reino Unido - Silverstone</option>
+                <option value="Hungría - Hungaroring">Hungría - Hungaroring</option>
+                <option value="Bélgica - Spa-Francorchamps">Bélgica - Spa-Francorchamps</option>
+                <option value="Países Bajos - Zandvoort">Países Bajos - Zandvoort</option>
+                <option value="Italia - Monza">Italia - Monza</option>
+                <option value="Azerbaiyán - Bakú">Azerbaiyán - Bakú</option>
+                <option value="Singapur - Marina Bay">Singapur - Marina Bay</option>
+                <option value="Estados Unidos - Austin">Estados Unidos - Austin</option>
+                <option value="México - Ciudad de México">México - Ciudad de México</option>
+                <option value="Brasil - Interlagos">Brasil - Interlagos</option>
+                <option value="Las Vegas - Las Vegas">Las Vegas - Las Vegas</option>
+                <option value="Qatar - Losail">Qatar - Losail</option>
+                <option value="Abu Dhabi - Yas Marina">Abu Dhabi - Yas Marina</option>
+            </select>
+            
+            <label for="weather-selector">Weather:</label>
+            <select id="weather-selector">
+                <option value="dry">Dry</option>
+                <option value="rain">Rain</option>
+                <option value="heavyrain">Heavy Rain</option>
+            </select>
+            
+            <button type="submit" id="get-strategy-btn">Get the Best Strategy</button>
+        </form>
+        <div id="strategy-results"></div>
+        <div id="start-race-container" style="display: none; text-align: center; margin-top: 30px;">
+            <button id="start-race-btn">Start Race</button>
+        </div>
+        
+    </main>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const strategyForm = document.getElementById('strategy-form');
+            const getStrategyButton = document.getElementById('get-strategy-btn');
+
+            // Datos de los circuitos
+            const circuitData = {
+                "Bahréin - Sakhir": { "laps": 57, "pitStopTime": 22 },
+                "Arabia Saudí - Jeddah": { "laps": 50, "pitStopTime": 21 },
+                "Australia - Albert Park": { "laps": 58, "pitStopTime": 23 },
+                "Japón - Suzuka": { "laps": 53, "pitStopTime": 21 },
+                "China - Shanghái": { "laps": 56, "pitStopTime": 22 },
+                "Miami - Miami": { "laps": 57, "pitStopTime": 22 },
+                "Emilia-Romaña - Imola": { "laps": 63, "pitStopTime": 21 },
+                "Mónaco - Monte Carlo": { "laps": 78, "pitStopTime": 19 },
+                "Canadá - Montreal": { "laps": 70, "pitStopTime": 18 },
+                "España - Montmeló": { "laps": 66, "pitStopTime": 20 },
+                "Austria - Red Bull Ring": { "laps": 71, "pitStopTime": 18 },
+                "Reino Unido - Silverstone": { "laps": 52, "pitStopTime": 22 },
+                "Hungría - Hungaroring": { "laps": 70, "pitStopTime": 19 },
+                "Bélgica - Spa-Francorchamps": { "laps": 44, "pitStopTime": 21 },
+                "Países Bajos - Zandvoort": { "laps": 72, "pitStopTime": 18 },
+                "Italia - Monza": { "laps": 53, "pitStopTime": 19 },
+                "Azerbaiyán - Bakú": { "laps": 51, "pitStopTime": 21 },
+                "Singapur - Marina Bay": { "laps": 62, "pitStopTime": 22 },
+                "Estados Unidos - Austin": { "laps": 56, "pitStopTime": 20 },
+                "México - Ciudad de México": { "laps": 71, "pitStopTime": 21 },
+                "Brasil - Interlagos": { "laps": 71, "pitStopTime": 20 },
+                "Las Vegas - Las Vegas": { "laps": 50, "pitStopTime": 20 },
+                "Qatar - Losail": { "laps": 57, "pitStopTime": 21 },
+                "Abu Dhabi - Yas Marina": { "laps": 58, "pitStopTime": 20 }
+            };
+
+            strategyForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const circuit = document.getElementById('circuit-selector').value;
+                const weather = document.getElementById('weather-selector').value;
+
+                if (circuit === "" || weather === "") {
+                    alert("Por favor, selecciona tanto un circuito como un clima.");
+                    return;
+                }
+
+                localStorage.setItem('weatherState', weather);
+
+                const { laps, pitStopTime } = circuitData[circuit];
+
+                localStorage.setItem('pitStopTime', pitStopTime);
+
+                getStrategyButton.innerText = "Calculando...";
+                getStrategyButton.disabled = true;
+
+                fetch('/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ circuit, laps, pitStopTime, weather })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        renderStrategy(data);
+
+                        localStorage.setItem('strategyResults', JSON.stringify(data));
+
+                        getStrategyButton.innerText = "Get the Best Strategy";
+                        getStrategyButton.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error("Error al obtener la estrategia:", error);
+                        alert("Hubo un error al obtener la estrategia.");
+
+                        getStrategyButton.innerText = "Get the Best Strategy";
+                        getStrategyButton.disabled = false;
+                    });
+            });
+        });
+
+        function renderStrategy(results) {
+            const container = document.getElementById('strategy-results');
+            container.innerHTML = ''; // Limpiar contenido previo
+
+            for (const [key, data] of Object.entries(results)) {
+                if (key === 'global') continue; // Ignorar "global" en esta parte
+
+                const section = document.createElement('div');
+                section.className = 'strategy-section';
+
+                const title = document.createElement('h3');
+                title.textContent = `Strategy: ${key}`;
+                section.appendChild(title);
+
+                const totalTime = document.createElement('p');
+                totalTime.textContent = `Total time: ${data.tiempo}`;
+                section.appendChild(totalTime);
+
+                // Crear contenedor para la línea de estrategia
+                const strategyLine = document.createElement('div');
+                strategyLine.className = 'strategy-line';
+                strategyLine.style.display = 'flex';
+                strategyLine.style.position = 'relative'; // Posicionamiento relativo para los marcadores
+                strategyLine.style.height = '50px'; // Espacio adicional para las imágenes
+                strategyLine.style.margin = '0px 20px 40px'; // Añadir margen a los lados de la línea y arriba y abajo
+
+                data.estrategia.forEach((stint, index) => {
+                    const stintDiv = document.createElement('div');
+                    stintDiv.className = 'stint';
+
+                    // Asignar color según el neumático
+                    let color;
+                    switch (stint.neumatico) {
+                        case 'blando':
+                            color = 'red';
+                            break;
+                        case 'medio':
+                            color = 'yellow';
+                            break;
+                        case 'duro':
+                            color = 'white';
+                            break;
+                        case 'intermedio':
+                            color = 'green';
+                            break;
+                        case 'lluvia':
+                            color = 'blue';
+                            break;
+                        default:
+                            color = 'gray';
+                    }
+                    stintDiv.style.backgroundColor = color;
+
+                    // Calcular ancho del stint proporcional a la duración
+                    stintDiv.style.flex = stint.fin - stint.inicio;
+
+                    // Insertar el stint en la línea de estrategia
+                    strategyLine.appendChild(stintDiv);
+
+                    // Añadir marcador de neumático para todos los stints
+                    const stopMarker = document.createElement('div');
+                    stopMarker.className = 'stop-marker';
+                    stopMarker.style.position = 'absolute';
+                    stopMarker.style.top = '0px'; // Elevar el marcador sobre la línea
+                    stopMarker.style.left = `${(stint.inicio / data.estrategia[data.estrategia.length - 1].fin) * 100}%`; // Posición proporcional
+
+                    // Crear imagen del neumático
+                    const img = document.createElement('img');
+                    img.src = `/static/images/${stint.neumatico}.png`; // Ruta de la imagen
+                    img.alt = stint.neumatico;
+                    img.className = 'tire-image';
+                    img.style.width = '50px'; // Aumentar tamaño
+                    img.style.height = '50px';
+
+                    // Crear texto para la vuelta de inicio
+                    const stopText = document.createElement('span');
+                    stopText.textContent = `Lap ${stint.inicio}`;
+                    stopText.style.fontSize = '12px';
+                    stopText.style.display = 'block'; // Para que el texto aparezca debajo de la imagen
+                    stopText.style.textAlign = 'center';
+
+                    // Añadir imagen y texto al marcador
+                    stopMarker.appendChild(img);
+                    stopMarker.appendChild(stopText);
+
+                    // Insertar el marcador en la línea de estrategia
+                    strategyLine.appendChild(stopMarker);
+                });
+
+                section.appendChild(strategyLine);
+                container.appendChild(section);
+
+                // Mostrar selector y botón
+                const startContainer = document.getElementById('start-race-container');
+                startContainer.innerHTML = ''; // Limpia por si ya existía
+
+                // Selector
+                const select = document.createElement('select');
+                select.id = 'strategy-selector';
+                select.style.marginRight = '20px';
+                select.style.padding = '10px';
+                select.style.fontSize = '16px';
+
+                ['Alpha','Bravo','Charlie','Delta'].forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    select.appendChild(option);
+                });
+
+                startContainer.appendChild(select);
+
+                // Botón Start Race
+                const startButton = document.createElement('button');
+                startButton.id = 'start-race-btn';
+                startButton.textContent = 'Start Race';
+                startContainer.appendChild(startButton);
+
+                // Activar el botón justo después de crearlo
+                startButton.addEventListener('click', function () {
+                    const selectedStrategy = select.value;
+                
+                    if (!['Alpha','Bravo','Charlie','Delta'].includes(selectedStrategy)) {
+                        alert("Por favor, selecciona una estrategia válida.");
+                        return;
+                    }
+                
+                    localStorage.setItem('chosenStrategy', selectedStrategy);
+                    window.location.href = '/race';
+                });
+                
+                // Mostrar el contenedor si estaba oculto
+                startContainer.style.display = 'block';
+            }
+
+            document.getElementById('start-race-container').style.display = 'block';
+        }
+
+        document.getElementById('start-race-btn').addEventListener('click', function () {
+            const select = document.getElementById('strategy-selector');
+            const selectedStrategy = select.value;
+
+            if (!["1", "2", "3"].includes(selectedStrategy)) {
+                alert("Por favor, selecciona una estrategia válida.");
+                return;
+            }
+
+            localStorage.setItem('chosenStrategy', selectedStrategy);
+            window.location.href = '/race';
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Race Simulation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        #lap-counter {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            margin: 10px auto 30px;
+            text-align: center;
+        }
+    
+        .strategy-line, .progress-line {
+            display: flex;
+            height: 40px;
+            margin: 50px 20px;
+            position: relative;
+            border-radius: 5px;
+            overflow: visible;
+        }
+
+    
+        .progress-lap {
+            flex: 1;
+            background-color: #ccc;
+            height: 100%;
+        }
+    
+        .stop-marker {
+            position: absolute;
+            bottom: 100%; /* se coloca encima de la línea */
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+    
+        .stop-marker img {
+            width: 50px;
+            height: 50px;
+        }
+    
+        .stop-marker span {
+            display: block;
+            font-size: 12px;
+            color: white;
+            text-align: center;
+            margin-top: 2px;
+        }
+    
+        .arrow-marker {
+            position: absolute;
+            top: 75%; /* en lugar de bottom negativo, para que no suba la alutra en la penultima vuelta */
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+        }
+    
+        .arrow-marker img {
+            width: 50px;
+            height: 50px;
+        }
+    
+        .arrow-marker span {
+            display: block;
+            font-size: 12px;
+            color: white;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        .pitstop-marker {
+            pointer-events: none;
+        }
+
+        #race-buttons button:disabled {
+        background-color: gray !important;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    #weather-buttons {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #weather-buttons button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+    }
+
+    .disabled {
+        background-color: grey;
+        cursor: not-allowed;
+    }
+
+    </style>       
+</head>
+<body>
+    <header>
+        <h1>Race Simulation</h1>
+    </header>
+    <main>
+        <div id="race-buttons" style="margin-bottom: 20px; text-align: center;">
+            <button id="advance-lap-btn">Advance Lap</button>
+            <button id="btn-safety">Safety Car</button>
+            <button id="btn-virtual-sc">Virtual Safety Car</button>
+            <button id="btn-redflag">Red Flag</button>
+        </div>        
+        <div id="weather-buttons">
+            <button id="btn-seco">Dry</button>
+            <button id="btn-lluvia">Rain</button>
+            <button id="btn-lluvia-fuerte">Heavy Rain</button>
+        </div>
+        <div id="lap-counter"></div>
+
+        <div id="race-strategy-container"></div>
+    </main>
+
+    <script>
+       
+        let title;
+        let strategy;
+        let totalLaps;
+        let originalTotalLaps;
+        let reducedPitStopUsed = false;
+
+        // --- Copia de la lógica backend para calcular el tiempo de una vuelta ---
+        const BASE_TIMES = {
+        blando: 80.0,
+        medio: 80.4,
+        duro: 80.7,
+        intermedio: 90.0,
+        lluvia: 95.0,
+        };
+
+        const DEGRADE_FACTORS = {
+        blando: 1.005,
+        medio: 1.002,
+        duro: 1.00095,
+        intermedio: 1.001,
+        lluvia: 1.0012,
+        };
+
+        const WEATHER_MOD = {
+        dry:      { blando:1.0, medio:1.0,  duro:1.0,   intermedio:1.1, lluvia:1.2 },
+        rain:     { blando:1.1, medio:1.1,  duro:1.1,   intermedio:0.9, lluvia:1.0 },
+        heavyrain:{ blando:1.2, medio:1.2,  duro:1.2,   intermedio:1.0, lluvia:0.9 },
+        };
+
+        function tiempoNeumatico(tipo, lapInStint, weather) {
+        const base = BASE_TIMES[tipo];
+        const factor = Math.pow(DEGRADE_FACTORS[tipo], lapInStint * lapInStint);
+        const mod = WEATHER_MOD[weather] ? WEATHER_MOD[weather][tipo] : WEATHER_MOD.dry[tipo];
+        return base * mod + factor;
+        }
+        
+        // Formatear segundos en h, m, s
+        function formatearTiempo(segundos) {
+            const horas = Math.floor(segundos / 3600);
+            const minutos = Math.floor((segundos % 3600) / 60);
+            const segs = (segundos % 60).toFixed(2);
+            return `${horas}h ${minutos}m ${segs}s`;
+        }
+
+        // Función sencilla para convertir "Xh Ym Z.ZZs" a segundos
+        function parsearTiempo(tiempoStr) {
+            const partes = tiempoStr.split(' ');
+            let totalSegundos = 0;
+            
+            partes.forEach(parte => {
+                const valor = parseFloat(parte);
+                if (parte.endsWith('h')) {
+                    totalSegundos += valor * 3600;
+                } else if (parte.endsWith('m')) {
+                    totalSegundos += valor * 60;
+                } else if (parte.endsWith('s')) {
+                    totalSegundos += valor;
+                }
+            });
+            
+            return totalSegundos;
+        }
+        
+        // ---------------------------------------------------------------------
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("✅ DOM fully loaded");
+
+            // Inicializamos el estado del clima con el valor almacenado en el localStorage o 'dry' como valor por defecto
+            let weatherState = localStorage.getItem('weatherState'); 
+
+            console.log(weatherState);          
+            
+            let weatherButtons = {
+                seco: document.getElementById('btn-seco'),
+                lluvia: document.getElementById('btn-lluvia'),
+                lluviaFuerte: document.getElementById('btn-lluvia-fuerte')
+            };
+
+            // Función para actualizar los botones según el clima
+            function updateWeatherButtons() {
+                if (weatherState === 'dry') {
+                    // Si es seco, solo habilitar lluvia y lluvia fuerte
+                    weatherButtons.seco.classList.add('disabled');
+                    weatherButtons.lluvia.classList.remove('disabled');
+                    weatherButtons.lluviaFuerte.classList.remove('disabled');
+                } else if (weatherState === 'rain') {
+                    // Si es lluvia, solo habilitar seco y lluvia fuerte
+                    weatherButtons.seco.classList.remove('disabled');
+                    weatherButtons.lluvia.classList.add('disabled');
+                    weatherButtons.lluviaFuerte.classList.remove('disabled');
+                } else if (weatherState === 'heavyrain') {
+                    // Si es lluvia fuerte, solo habilitar seco y lluvia
+                    weatherButtons.seco.classList.remove('disabled');
+                    weatherButtons.lluvia.classList.remove('disabled');
+                    weatherButtons.lluviaFuerte.classList.add('disabled');
+                }
+            }
+
+            // Event listeners para cada botón de clima
+            weatherButtons.seco.addEventListener('click', function () {
+                if (!weatherButtons.seco.classList.contains('disabled')) {
+                    weatherState = 'dry';
+                    updateWeatherButtons();
+                    console.log("Weather changed to dry");
+                    recalculateAndRenderStrategy();
+                }
+            });
+
+            weatherButtons.lluvia.addEventListener('click', function () {
+                if (!weatherButtons.lluvia.classList.contains('disabled')) {
+                    weatherState = 'rain';
+                    updateWeatherButtons();
+                    console.log("Weather changed to rain");
+                    recalculateAndRenderStrategy();
+                }
+            });
+
+            weatherButtons.lluviaFuerte.addEventListener('click', function () {
+                if (!weatherButtons.lluviaFuerte.classList.contains('disabled')) {
+                    weatherState = 'heavyrain';
+                    updateWeatherButtons();
+                    console.log("Weather changed to heavy rain");
+                    recalculateAndRenderStrategy();
+                }
+            });
+
+            // Actualizamos el estado de los botones
+            updateWeatherButtons();
+
+            let currentLap = 0;
+            let originalPitStopTime = 0;
+            let currentPitStopTime = 0;
+            let isSafetyCar = false;
+            let isVirtualSC = false;
+            let isRedFlag = false;
+
+            const selected = localStorage.getItem('chosenStrategy');
+            const strategyData = localStorage.getItem('strategyResults');
+            console.log("📦 strategyData loaded:", strategyData);
+
+
+            originalPitStopTime = parseFloat(localStorage.getItem('pitStopTime')); 
+            currentPitStopTime = originalPitStopTime;
+
+
+            if (!selected || !strategyData) {
+                document.getElementById('race-strategy-container').innerText = 'No strategy selected.';
+                return;
+            }
+
+            strategy = JSON.parse(strategyData)[selected];
+            totalLaps = strategy.estrategia[strategy.estrategia.length - 1].fin;
+            originalTotalLaps = totalLaps;  // ✅ Guarda el valor inicial
+
+
+            const container = document.getElementById('race-strategy-container');
+            const lapCounter = document.getElementById('lap-counter');
+
+            // Título
+            title = document.createElement('h2');
+            //title.textContent = `Tu estrategia (${selected} parada/s) - Tiempo total: ${strategy.tiempo}`;
+            title.textContent = `Best Strategy`;
+
+            title.style.margin = '0px 20px 10px';
+            container.appendChild(title);
+
+            // === Línea superior: estrategia completa ===
+            const strategyLine = document.createElement('div');
+            strategyLine.className = 'strategy-line';
+            strategyLine.style.height = '40px';
+            strategyLine.style.position = 'relative';
+
+            strategy.estrategia.forEach((stint) => {
+                const stintDiv = document.createElement('div');
+                stintDiv.className = 'stint';
+                stintDiv.style.flex = stint.fin - stint.inicio;
+
+                switch (stint.neumatico) {
+                    case 'blando': stintDiv.style.backgroundColor = 'red'; break;
+                    case 'medio': stintDiv.style.backgroundColor = 'yellow'; break;
+                    case 'duro': stintDiv.style.backgroundColor = 'white'; break;
+                    case 'intermedio': stintDiv.style.backgroundColor = 'green'; break;
+                    case 'lluvia': stintDiv.style.backgroundColor = 'blue'; break;
+                    default: stintDiv.style.backgroundColor = 'gray';
+                }
+
+                strategyLine.appendChild(stintDiv);
+
+                // Imagen de neumático y texto de parada
+                const stopMarker = document.createElement('div');
+                stopMarker.className = 'stop-marker';
+                stopMarker.style.position = 'absolute';
+                stopMarker.style.top = '0px';
+                stopMarker.style.left = `${(stint.inicio / totalLaps) * 100}%`;
+
+                const img = document.createElement('img');
+                img.src = `/static/images/${stint.neumatico}.png`;
+                img.alt = stint.neumatico;
+                img.className = 'tire-image';
+                img.style.width = '50px';
+                img.style.height = '50px';
+
+                const stopText = document.createElement('span');
+                stopText.textContent = `Lap ${stint.inicio}`;
+                stopText.style.fontSize = '12px';
+                stopText.style.display = 'block';
+                stopText.style.textAlign = 'center';
+
+                stopMarker.appendChild(img);
+                stopMarker.appendChild(stopText);
+                strategyLine.appendChild(stopMarker);
+            });
+
+            container.appendChild(strategyLine);
+
+            // Separador visual entre estrategia y progreso
+            const spacer = document.createElement('div');
+            spacer.style.height = '5px'; // Puedes ajustar esta altura si quieres más o menos separación
+            container.appendChild(spacer);
+
+
+            // Título para la barra de progreso
+            const progressTitle = document.createElement('h2');
+            progressTitle.textContent = 'Race Progress';
+            progressTitle.style.margin = '60px 20px 10px';
+            container.appendChild(progressTitle);
+
+
+            // === Línea inferior: progreso ===
+            const progressLine = document.createElement('div');
+            progressLine.className = 'progress-line';
+            const progressLaps = [];
+
+            for (let i = 1; i <= totalLaps; i++) {
+                const lapDiv = document.createElement('div');
+                lapDiv.className = 'progress-lap';
+                lapDiv.dataset.lap = i;
+                progressLine.appendChild(lapDiv);
+                progressLaps.push(lapDiv);
+            }
+
+            // Flecha de posición actual
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow-marker';
+            const arrowImg = document.createElement('img');
+            // Inicialmente se usa el neumático de la primera vuelta
+            arrowImg.src = `/static/images/${getTyreAtLap(currentLap)}.png`;
+            arrowImg.alt = 'Neumático actual';
+
+            const arrowText = document.createElement('span');
+            arrow.appendChild(arrowImg);
+            arrow.appendChild(arrowText);
+            progressLine.appendChild(arrow);
+
+            container.appendChild(progressLine);
+
+            // === Funciones ===
+
+            function getTyreAtLap(lap) {
+                for (const stint of strategy.estrategia) {
+                    if (lap >= stint.inicio && lap < stint.fin) {
+                        return stint.neumatico;
+                    }
+                }
+                return null;
+            }
+
+            function updateRaceDisplay() {
+                lapCounter.textContent = `Lap ${currentLap} / ${totalLaps}`;
+
+                // Pintar las vueltas ya completadas
+                for (let i = 0; i < currentLap; i++) {
+                    const tyre = getTyreAtLap(i);
+                    const div = progressLaps[i];
+
+                    switch (tyre) {
+                    case 'blando': div.style.backgroundColor = 'red'; break;
+                    case 'medio': div.style.backgroundColor = 'yellow'; break;
+                    case 'duro': div.style.backgroundColor = 'white'; break;
+                    case 'intermedio': div.style.backgroundColor = 'green'; break;
+                    case 'lluvia': div.style.backgroundColor = 'blue'; break;
+                    default: div.style.backgroundColor = 'gray';
+                    }
+                }
+
+                // Añadir marcador de pit stop si la vuelta actual inicia un nuevo stint (y no es vuelta 0)
+                const currentStint = strategy.estrategia.find(s => s.inicio === currentLap);
+                if (currentStint && currentLap !== 0) {
+                    const marker = document.createElement('div');
+                    marker.className = 'pitstop-marker';
+                    marker.style.position = 'absolute';
+                    marker.style.top = '55%';
+                    marker.style.left = `${(currentLap / totalLaps) * 100}%`;
+                    marker.style.transform = 'translate(-50%, -50%)';
+                    marker.style.zIndex = '15';
+
+                    const img = document.createElement('img');
+                    img.src = '/static/images/pitstop.png';
+                    img.alt = 'Pit Stop';
+                    img.style.width = '40px';
+                    img.style.height = '40px';
+
+                    marker.appendChild(img);
+                    progressLine.appendChild(marker);
+                }
+
+
+                // Actualizar posición de la flecha
+                const percent = (currentLap) / totalLaps * 100;
+                arrow.style.left = `${percent}%`;
+                arrowText.textContent = `Lap ${currentLap}`;
+                arrowImg.src = `/static/images/${getTyreAtLap(currentLap)}.png`;
+
+                if (currentLap >= totalLaps) {
+                    arrow.style.display = 'none'; // Ocultar completamente la flecha neumático
+                } else {
+                    arrow.style.display = 'block'; // Asegurar que se muestre si no es la última vuelta
+                }
+            }
+
+            function setButtonsDisabled(disabled) {
+                document.querySelectorAll('#race-buttons button').forEach(btn => {
+                    btn.disabled = disabled;
+                });
+            }
+
+            updateRaceDisplay();
+
+            function drawRaceEventIcon(eventType) {
+                const eventIcons = {
+                    safety: 'SC.png',
+                    virtualSC: 'VSC.png',
+                    redflag: 'RedFlag.png'
+                };
+
+                const imgSrc = `/static/images/${eventIcons[eventType]}`;
+                const marker = document.createElement('div');
+                marker.className = 'event-marker';
+                marker.style.position = 'absolute';
+                marker.style.top = '-20px';
+                marker.style.left = `${(currentLap / totalLaps) * 100}%`;
+                marker.style.transform = 'translateX(-50%)';
+                marker.style.zIndex = '20';
+
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = eventType;
+                img.style.width = '40px';
+                img.style.height = '40px';
+
+                marker.appendChild(img);
+                progressLine.appendChild(marker);
+            }
+
+
+            // Botón: avanzar vuelta
+            document.getElementById('advance-lap-btn').addEventListener('click', () => {
+                
+                if (isRedFlag) {
+                    alert("¡La carrera está detenida por bandera roja!");
+                    return;
+                }
+
+                if (currentLap < totalLaps) {
+                    currentLap++;
+                    updateRaceDisplay();
+                } else {
+                    alert("¡La carrera ha terminado!");
+                }
+            });
+
+            document.getElementById('btn-safety').addEventListener('click', function () {
+                reducedPitStopUsed = false;
+                if (!isSafetyCar) {
+                    isSafetyCar = true;
+                    currentPitStopTime = originalPitStopTime / 2;
+                    this.textContent = "Ending";
+                    drawRaceEventIcon('safety');  
+                    advanceLapAndUpdate();
+                } else {
+                    isSafetyCar = false;
+                    currentPitStopTime = originalPitStopTime;
+                    this.textContent = "Safety Car";
+                    advanceLap();
+                }
+                reducedPitStopUsed = true;
+            });
+
+            document.getElementById('btn-virtual-sc').addEventListener('click', function () {
+                reducedPitStopUsed = false;
+                if (!isVirtualSC) {
+                    isVirtualSC = true;
+                    currentPitStopTime = originalPitStopTime / 2;
+                    this.textContent = "Ending";
+                    drawRaceEventIcon('virtualSC');  
+                    advanceLapAndUpdate();
+                } else {
+                    isVirtualSC = false;
+                    currentPitStopTime = originalPitStopTime;
+                    this.textContent = "Virtual Safety Car";
+                    advanceLap();
+                }
+                reducedPitStopUsed = true;
+            });
+
+            document.getElementById('btn-redflag').addEventListener('click', function () {
+                reducedPitStopUsed = false;
+                if (!isRedFlag) {
+                    isRedFlag = true;
+                    currentPitStopTime = 0;
+                    this.textContent = "Resume session";
+                    alert("Red flag! Session stopped.");
+                    drawRaceEventIcon('redflag');  
+                    recalculateAndRenderStrategy();
+                } else {
+                    isRedFlag = false;
+                    currentPitStopTime = originalPitStopTime;
+                    this.textContent = "Red Flag";
+                    alert("Session resumed.");
+                }
+                reducedPitStopUsed = true;
+            });
+
+            function advanceLapAndUpdate() {
+                if (!isRedFlag && currentLap < totalLaps) {
+                    currentLap++;
+                    updateRaceDisplay();
+                    recalculateAndRenderStrategy();
+                }
+            }
+
+            function advanceLap() {
+                if (!isRedFlag && currentLap < totalLaps) {
+                    currentLap++;
+                    updateRaceDisplay();
+                }
+            }
+
+            function recalculateAndRenderStrategy() {
+
+                const currentTyre = getTyreAtLap(currentLap);
+                const effectivePitStopTime = reducedPitStopUsed ? originalPitStopTime : currentPitStopTime;
+                let currentTyreLaps = 0;
+
+                // calcular cuántas vueltas lleva el neumático actual
+                for (const stint of strategy.estrategia) {
+                    if (currentLap >= stint.inicio && currentLap < stint.fin) {
+                        currentTyreLaps = currentLap - stint.inicio;
+                        break;
+                    }
+                }
+                console.log("🧠 Recalculando estrategia con:");
+                console.log("➡️ vueltas restantes:", totalLaps - currentLap);
+                console.log("➡️ neumático actual:", currentTyre);
+                console.log("➡️ desgaste:", currentTyreLaps);
+                console.log("➡️ pitStopTime:", currentPitStopTime);
+                console.log("➡️ weather:", weatherState);
+                console.log("🧾 Ya ha parado:", hasAlreadyPitted());
+
+                setButtonsDisabled(true);  // 🚫 Bloquea botones
+
+                // Pedimos nueva estrategia al backend con los datos actuales
+                fetch('/calcular', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        circuit: localStorage.getItem('selectedCircuit'),
+                        laps: totalLaps - currentLap,
+                        pitStopTime: originalPitStopTime, // para las paradas normales
+                        firstPitStopTimeEvent: effectivePitStopTime, // para la primera parada tras evento
+                        weather: weatherState,
+                        currentTyre: currentTyre,
+                        currentTyreLaps: currentTyreLaps,
+                        alreadyPitted: hasAlreadyPitted()
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("✅ Respuesta del backend:", data);
+
+                    // Guardamos la nueva estrategia en localStorage y re-renderizamos la línea
+                    localStorage.setItem('strategyResults', JSON.stringify(data));
+                    const chosen = 'global';
+                    const newStrategy = data[chosen];
+
+                    // 🧩 Parte ya recorrida
+                    const completedPart = strategy.estrategia.filter(s => s.fin <= currentLap);
+
+                    // 🧩 Si estás en medio de un stint, guarda la parte recorrida
+                    const currentStint = strategy.estrategia.find(s => s.inicio <= currentLap && currentLap < s.fin);
+                    if (currentStint && currentLap > currentStint.inicio) {
+                        completedPart.push({
+                            neumatico: currentStint.neumatico,
+                            inicio: currentStint.inicio,
+                            fin: currentLap
+                        });
+                    }
+
+                    let adjustedPart = newStrategy.estrategia.map(s => ({
+                        neumatico: s.neumatico,
+                        inicio: s.inicio + currentLap,
+                        fin: s.fin + currentLap
+                    }));
+
+                    // 🔍 Comprobar si el primer stint de la nueva estrategia es continuación del anterior
+                    if (completedPart.length > 0 && adjustedPart.length > 0) {
+                        const ultimoStint = completedPart[completedPart.length - 1];
+                        const primerNuevo = adjustedPart[0];
+
+                        if (ultimoStint.neumatico === primerNuevo.neumatico && ultimoStint.fin === primerNuevo.inicio) {
+                            // Fundir los stints
+                            ultimoStint.fin = primerNuevo.fin;
+                            adjustedPart.shift(); // Eliminar el primer stint duplicado
+                        }
+                    }
+
+                    // 🧩 Componer estrategia final
+                    strategy = {
+                        ...newStrategy,
+                        estrategia: [...completedPart, ...adjustedPart]
+                    };
+
+
+                    totalLaps = originalTotalLaps;
+
+                    /*
+
+                    // --- calculamos el tiempo real ya corrido según cada vuelta ---
+                    let elapsedSecs = 0;
+                    strategy.estrategia.forEach(stint => {
+                        const start = stint.inicio, end = stint.fin;
+                        for (let i = 1; i <= end - start; i++) {
+                            const absLap = start + i - 1;
+                            if (absLap < currentLap) {
+                                elapsedSecs += tiempoNeumatico(stint.neumatico, i, weatherState);
+                            }
+                        }
+                    });
+                    
+                    // parseamos el "restante" que devuelve el backend
+                    const remSecs = parsearTiempo(newStrategy.tiempo);
+
+                    // sumamos transcurrido + restante y formateamos
+                    const totalSecs = elapsedSecs + remSecs;
+                    const totalFmt = formatearTiempo(totalSecs);
+
+                    */
+
+                    //title.textContent = `Tu estrategia (${chosen} parada/s) - Tiempo total: ${totalFmt}`;
+
+                    title.textContent = `Best Strategy`;
+
+
+                    console.log("📊 Estrategia combinada:", strategy);
+                    updateStrategyLine(strategy);
+                    updateRaceDisplay();
+                    setButtonsDisabled(false); // ✅ Vuelve a habilitar
+                })
+                .catch(err => {
+                    console.error("❌ Error al recalcular estrategia:", err);
+                    setButtonsDisabled(false);
+                });
+            }
+
+            function hasAlreadyPitted() {
+                if (!strategy || !strategy.estrategia) {
+                    console.warn("⚠️ Estrategia no definida al comprobar si ha habido parada.");
+                    return false;
+                }
+
+                const usedTyres = new Set();
+                for (const stint of strategy.estrategia) {
+                    if (stint.fin <= currentLap) {
+                        usedTyres.add(stint.neumatico);
+                    } else if (stint.inicio <= currentLap && currentLap < stint.fin) {
+                        usedTyres.add(stint.neumatico);
+                        break;
+                    }
+                }
+                return usedTyres.size >= 2;
+            }
+
+            function updateStrategyLine(strategy) {
+                
+                console.log("🔄 Redibujando línea de estrategia...");
+                console.log("📈 totalLaps en este punto:", totalLaps);
+                console.log("🧩 Estrategia a renderizar:", strategy);
+
+                document.querySelectorAll('.strategy-line').forEach(el => el.remove());
+
+                const newLine = document.createElement('div');
+                newLine.className = 'strategy-line';
+                newLine.style.position = 'relative';
+
+                //const lastLapInStrategy = strategy.estrategia[strategy.estrategia.length - 1].fin;
+                const filteredStints = strategy.estrategia.filter(stint => stint.inicio < originalTotalLaps);
+
+                filteredStints.forEach((stint) => {
+                    const safeStint = {
+                        ...stint,
+                        fin: Math.min(stint.fin, originalTotalLaps)
+                    };
+
+                    const stintDiv = document.createElement('div');
+                    stintDiv.className = 'stint';
+                    stintDiv.style.flex = (safeStint.fin - safeStint.inicio) / originalTotalLaps;
+
+                    switch (safeStint.neumatico) {
+                    case 'blando': stintDiv.style.backgroundColor = 'red'; break;
+                    case 'medio': stintDiv.style.backgroundColor = 'yellow'; break;
+                    case 'duro': stintDiv.style.backgroundColor = 'white'; break;
+                    case 'intermedio': stintDiv.style.backgroundColor = 'green'; break;
+                    case 'lluvia': stintDiv.style.backgroundColor = 'blue'; break;
+                    default: stintDiv.style.backgroundColor = 'gray';
+                    }
+
+                    newLine.appendChild(stintDiv);
+
+                    const stopMarker = document.createElement('div');
+                    stopMarker.className = 'stop-marker';
+                    stopMarker.style.top = '0px'; // 🔧 Corrige la altura
+                    stopMarker.style.left = `${(safeStint.inicio / originalTotalLaps) * 100}%`;
+
+                    const img = document.createElement('img');
+                    img.src = `/static/images/${safeStint.neumatico}.png`;
+                    img.alt = safeStint.neumatico;
+                    img.style.width = '50px';
+                    img.style.height = '50px';
+
+                    const stopText = document.createElement('span');
+                    stopText.textContent = `Lap ${safeStint.inicio}`;
+                    stopMarker.appendChild(img);
+                    stopMarker.appendChild(stopText);
+
+                    newLine.appendChild(stopMarker);
+                });
+
+                document.getElementById('race-strategy-container').insertBefore(newLine, document.querySelector('h2').nextSibling);
+            }
+        });
+    </script>
+</body>
+</html>

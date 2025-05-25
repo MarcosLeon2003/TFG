@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams - Fórmula 1</title>
+    <link rel="icon" href="https://lezebre.lu/images/detailed/79/45334-Sticker-Formula-1-nouveau-logo-F1.png" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg" alt="Fórmula 1 Logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('strategy') }}">Strategy</a></li>
+                <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                <li><a href="{{ url_for('circuits') }}">Circuits</a></li>
+                <li><a href="{{ url_for('teams') }}">Teams</a></li>
+                <li><a href="{{ url_for('drivers') }}">Drivers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Teams in Fórmula 1</h1>
+        <div class="teams-container">
+            <div class="team">
+                <h2>Mercedes AMG Petronas</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/mercedes" alt="Mercedes Logo">
+                <p>Drivers: Lewis Hamilton, George Russell</p>
+                <p>Headquarters: Brackley, Reino Unido</p>
+                <p>World Champions: 8</p>
+                <p>Foundation Year: 2010</p>
+            </div>
+
+            <div class="team">
+                <h2>Red Bull Racing</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/red%20bull" alt="Red Bull Logo">
+                <p>Drivers: Max Verstappen, Sergio Pérez</p>
+                <p>Headquarters: Milton Keynes, Reino Unido</p>
+                <p>World Champions: 6</p>
+                <p>Foundation Year: 2005</p>
+            </div>
+
+            <div class="team">
+                <h2>Scuderia Ferrari</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/ferrari" alt="Ferrari Logo">
+                <p>Drivers: Charles Leclerc, Carlos Sainz</p>
+                <p>Headquarters: Maranello, Italia</p>
+                <p>World Champions: 16</p>
+                <p>Foundation Year: 1950</p>
+            </div>
+
+            <div class="team">
+                <h2>McLaren F1 Team</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/mclaren" alt="McLaren Logo">
+                <p>Drivers: Lando Norris, Oscar Piastri</p>
+                <p>Headquarters: Woking, Reino Unido</p>
+                <p>World Champions: 8</p>
+                <p>Foundation Year: 1966</p>
+            </div>
+
+            <div class="team">
+                <h2>Alpine F1 Team</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/alpine" alt="Alpine Logo">
+                <p>Drivers: Esteban Ocon, Pierre Gasly</p>
+                <p>Headquarters: Enstone, Reino Unido</p>
+                <p>World Champions: 2</p>
+                <p>Foundation Year: 1981</p>
+            </div>
+
+            <div class="team">
+                <h2>Scuderia AlphaTauri</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/alphatauri" alt="AlphaTauri Logo">
+                <p>Drivers: Yuki Tsunoda, Daniel Ricciardo</p>
+                <p>Headquarters: Faenza, Italia</p>
+                <p>World Champions: 0</p>
+                <p>Foundation Year: 2020</p>
+            </div>
+
+            <div class="team">
+                <h2>Aston Martin Cognizant</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/aston%20martin" alt="Aston Martin Logo">
+                <p>Drivers: Fernando Alonso, Lance Stroll</p>
+                <p>Headquarters: Silverstone, Reino Unido</p>
+                <p>World Champions: 0</p>
+                <p>Foundation Year: 2021</p>
+            </div>
+
+            <div class="team">
+                <h2>Williams Racing</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/williams" alt="Williams Logo">
+                <p>Drivers: Alexander Albon, Logan Sargeant</p>
+                <p>Headquarters: Grove, Reino Unido</p>
+                <p>World Champions: 9</p>
+                <p>Foundation Year: 1977</p>
+            </div>
+
+            <div class="team">
+                <h2>Alfa Romeo Racing</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/alfa%20romeo" alt="Alfa Romeo Logo">
+                <p>Drivers: Valtteri Bottas, Zhou Guanyu</p>
+                <p>Headquarters: Hinwil, Suiza</p>
+                <p>World Champions: 0</p>
+                <p>Foundation Year: 2019</p>
+            </div>
+
+            <div class="team">
+                <h2>Haas F1 Team</h2>
+                <img src="https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/haas" alt="Haas Logo">
+                <p>Drivers: Kevin Magnussen, Nico Hülkenberg</p>
+                <p>Headquarters: Kannapolis, Estados Unidos</p>
+                <p>World Champions: 0</p>
+                <p>Foundation Year: 2016</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

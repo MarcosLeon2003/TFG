@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn - Fórmula 1</title>
+    <link rel="icon" href="https://lezebre.lu/images/detailed/79/45334-Sticker-Formula-1-nouveau-logo-F1.png" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg" alt="Fórmula 1 Logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('strategy') }}">Strategy</a></li>
+                <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                <li><a href="{{ url_for('circuits') }}">Circuits</a></li>
+                <li><a href="{{ url_for('teams') }}">Teams</a></li>
+                <li><a href="{{ url_for('drivers') }}">Drivers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Learn about Fórmula 1</h1>
+        <div class="button-container">
+            <a href="{{ url_for('pagina1') }}" class="large-button">
+                <h2>Formula 1</h2>
+                <br>
+                <img src="https://rtrsports.com/wp-content/uploads/2023/05/formula-1-points-1200x900.jpg" alt="Imagen 1">
+                <p>Learn how Formula 1 works</p>
+            </a>
+            <a href="{{ url_for('pagina2') }}" class="large-button">
+                <h2>Estrategia de Carrera</h2>
+                <br>
+                <img src="https://images.ctfassets.net/1fvlg6xqnm65/4uExKivR2YJxd54u5q38xm/db90d420cd40ddd076fc5ba01c0088d4/MQ6-10-image-20210922114705-7.jpg" alt="Imagen 2">
+                <p>Learn how the race strategy works in Formula 1</p>
+            </a>
+        </div>
+    </main>
+</body>
+</html>

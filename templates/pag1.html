@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Formula 1 Works</title>
+    <link rel="icon" href="https://lezebre.lu/images/detailed/79/45334-Sticker-Formula-1-nouveau-logo-F1.png" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg" alt="Fórmula 1 Logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('strategy') }}">Strategy</a></li>
+                <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                <li><a href="{{ url_for('circuits') }}">Circuits</a></li>
+                <li><a href="{{ url_for('teams') }}">Teams</a></li>
+                <li><a href="{{ url_for('drivers') }}">Drivers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>How Formula 1 Works</h1>
+        <div class="content-section">
+            <div class ="pag2-titleandtext">
+                <p>
+                    Formula 1 is a global motorsport series that represents the pinnacle of single-seater racing. Its structure is divided into race weekends, 
+                    which typically span three days, and includes several stages: practice sessions, qualifying sessions, and the race itself. 
+                    The format is designed to test the skill of the drivers and the engineering prowess of the teams, with variations introduced in some events to add excitement.
+                </p>
+                <p>
+                    On a standard race weekend, Friday is dedicated to free practice sessions. These allow drivers and teams to fine-tune their cars, gather data, and adapt to the specific conditions of the track. On Saturday, there’s usually a final 
+                    practice session followed by qualifying. Qualifying determines the starting grid for Sunday’s race, with drivers competing in a knockout format across three segments (Q1, Q2, Q3) to set the fastest lap times. The sprint format, used in some races, 
+                    alters this by replacing one practice session with a shorter qualifying session to set the grid for a short Saturday race. The result of the sprint race then determines the starting positions for Sunday’s main race.               
+                </p>
+                <p>
+                    The race itself, held on Sunday, involves drivers completing a set number of laps or racing for a specific duration, with the goal of finishing first. The outcome depends not only on the drivers’ performance but also on strategy, including pit stops, 
+                    tire management, and adapting to weather conditions.                
+                </p>
+            </div>
+            <img src="https://www.formula1.com/content/dam/fom-website/manual/Misc/2023manual/Pre-season/January/GettyImages-1386705161.jpg" alt="F1 race action">
+        </div>
+        <div class="content-section">
+            <img src="https://s1.elespanol.com/2018/04/06/actualidad/actualidad_297734160_72743137_1706x1280.jpg" alt="F1 race action">
+            <div class ="pag2-titleandtext">
+                <p>
+                    Points are awarded based on finishing positions in the main race, with the top ten drivers earning points. The winner receives 25 points, and lower positions earn progressively fewer points, with the 10th place earning one. In sprint races, 
+                    fewer points are available, usually for the top eight finishers. These points contribute to two championships: the Drivers’ Championship, where individuals compete for the title, and the Constructors’ Championship, 
+                    where teams accumulate points from their two drivers’ combined results.                
+                </p>
+                <p>
+                    Formula 1 currently features ten teams, each with two drivers. These teams include historic names like Ferrari, McLaren, and Mercedes, as well as newer contenders such as Haas and Alpine. The drivers represent a mix of seasoned veterans, 
+                    like Lewis Hamilton and Fernando Alonso, and rising stars, such as Max Verstappen and Lando Norris. Each team develops its car within strict regulations, balancing innovation with compliance to achieve the best performance.
+                </p>
+                <p>
+                    The combination of engineering ingenuity, driver talent, and strategic depth makes Formula 1 a unique and thrilling sport.               
+                </p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
